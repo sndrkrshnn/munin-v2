@@ -8,6 +8,7 @@ WORKDIR /app
 COPY requirements.txt .
 
 # Step 4: Install the Python dependencies
+RUN python -m pip install --upgrade pip
 RUN python -m pip install --no-cache-dir -r requirements.txt
 
 # Step 5: Copy the rest of your application code into the container
