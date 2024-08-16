@@ -1,39 +1,18 @@
-ARG MODEL=llama-2-13b-chat.ggmlv3.q4_0.bin
+# Step 1: Use a base image with Python
+FROM python:3.9-slim
 
-FROM ubuntu:22.04 AS builder
-ARG MODEL
+# Step 2: Set the working directory inside the container
+WORKDIR /app
 
-RUN apt-get update \
-    && apt-get upgrade -y \
-    && apt-get install -y build-essential git wget
+# Step 3: Copy the requirements.txt file into the container
+COPY requirements.txt .
 
-# Thanks to Adrien Brault (https://gist.github.com/adrienbrault/b76631c56c736def9bc1bc2167b5d129)
-RUN git clone https://github.com/ggerganov/llama.cpp.git && cd llama.cpp && make
+# Step 4: Install the Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
 
-WORKDIR /llama.cpp
+# Step 5: Copy the rest of your application code into the container
+COPY . .
 
-ENV MODEL=$MODEL
-RUN wget "https://huggingface.co/TheBloke/Llama-2-13B-chat-GGML/resolve/main/${MODEL}"
+# Step 6: Set the command to run your application
 
-FROM ubuntu:22.04 AS final
-ARG MODEL
-
-ARG UID=10001
-RUN adduser \
-    --disabled-password \
-    --gecos "" \
-    --home "/nonexistent" \
-    --shell "/sbin/nologin" \
-    --no-create-home \
-    --uid "${UID}" \
-    appuser
-USER appuser
-
-COPY --from=builder /llama.cpp /llama.cpp
-
-WORKDIR /llama.cpp
-
-ENV MODEL=$MODEL
-ENV PROMPT="Tell me a joke with a lama"
-
-ENTRYPOINT ./main -t 8 -ngl 1 -m ${MODEL} --color -c 2048 --temp 0.2 --repeat_penalty 1.1 -n -1 -p "[PROMPT] ${PROMPT} [/PROMPT]"
+CMD ["python", "main.py"]
