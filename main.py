@@ -7,9 +7,10 @@ import threading
 
 app = Flask(__name__)
 
-@app.route('/')
-def home():
-    return "This is a telegram bot running on Cloud Run."
+
+# @app.route('/')
+# def home():
+#     return "This is a telegram bot running on Cloud Run."
 
 # Define a few command handlers. These usually take the two arguments update and
 # context.
@@ -43,7 +44,7 @@ async def reply(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(response)
     
 
-
+@app.route('/')
 def main() -> None:
     """Start the bot."""
     # Create the Application and pass it your bot's token.
@@ -63,8 +64,8 @@ def main() -> None:
 
 if __name__ == "__main__":
     # Start background task in a separate thread
-    thread = threading.Thread(target=main)
-    thread.start()
+    # thread = threading.Thread(target=main)
+    # thread.start()
 
-    # Run Flask server
+    # # Run Flask server
     app.run(host='0.0.0.0', port=8080)
