@@ -7,8 +7,9 @@ from text.chat import generate_chat_response
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a message when the command /start is issued."""
     user = update.effective_user
+    response = await generate_chat_response("Introduce yourself!")
     await update.message.reply_html(
-        rf"Hi {user.mention_html()}!",
+        rf"Hello there, {user.mention_html()}! {response}",
         reply_markup=ForceReply(selective=True),
     )
 
