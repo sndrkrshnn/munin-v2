@@ -43,13 +43,10 @@ async def reply(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     response = await generate_chat_response(update.message.text)
     await update.message.reply_text(response)
     
-
+application = Application.builder().token("1921970606:AAFvOb2DLn58gQqaBGXy2R4a5PFewMcP5NE").build()
 @app.route('/')
 def main() -> None:
     """Start the bot."""
-    # Create the Application and pass it your bot's token.
-    application = Application.builder().token("1921970606:AAFvOb2DLn58gQqaBGXy2R4a5PFewMcP5NE").build()
-
     # on different commands - answer in Telegram
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("help", help_command))

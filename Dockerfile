@@ -11,4 +11,4 @@ COPY . .
 
 ENV OPENAI_API_KEY sk-proj-FomcOA0Ki3x5Sk2WERo0T3BlbkFJiShYtnFHtNh12QbODdyU
 EXPOSE 8080
-CMD ["python", "main.py"]
+ENTRYPOINT ["python", "main.py"]
