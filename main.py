@@ -2,6 +2,15 @@ from telegram import ForceReply, Update
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
 from image.generate_image import generate_image
 from text.chat import generate_chat_response
+from flask import Flask
+import threading
+
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return "This is a telegram bot running on Cloud Run."
+
 # Define a few command handlers. These usually take the two arguments update and
 # context.
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -53,4 +62,9 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    # Start background task in a separate thread
+    thread = threading.Thread(target=main)
+    thread.start()
+
+    # Run Flask server
+    app.run(host='0.0.0.0', port=8080)
