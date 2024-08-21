@@ -51,7 +51,7 @@ async def generate_chat_response(prompt):
         tool_choice="auto",
     )
     fn_res = None
-    if len(completion.choices[0].message.tool_calls) > 0:
+    if completion.choices[0].message.tool_calls and len(completion.choices[0].message.tool_calls) > 0:
         tool_call = completion.choices[0].message.tool_calls[0]
         arguments = json.loads(tool_call.function.arguments)
 
