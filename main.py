@@ -65,7 +65,7 @@ async def main() -> None:
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, reply))
     
     # Pass webhook settings to telegram
-    await application.bot.set_webhook(url=f"{WEBHOOK_URL}/telegram", allowed_updates=Update.ALL_TYPES)
+    await application.bot.set_webhook(url=f"{WEBHOOK_URL}", allowed_updates=Update.ALL_TYPES)
 
     @app.route("/", methods=["POST"])  # type: ignore[misc]
     async def telegram() -> Response:
