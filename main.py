@@ -1,3 +1,4 @@
+
 from telegram import ForceReply, Update
 from telegram.ext import (
     Application,
@@ -8,19 +9,13 @@ from telegram.ext import (
 )
 from image.generate_image import generate_image
 from text.chat import generate_chat_response
-from flask import Flask
-import threading
+from flask import Flask, request
 
 app = Flask(__name__)
 
+WEBHOOK_URL = 'https://munin-v2-732lhukoma-nw.a.run.app/'  # Replace with your actual domain
 
-# @app.route('/')
-# def home():
-#     return "This is a telegram bot running on Cloud Run."
-
-
-# Define a few command handlers. These usually take the two arguments update and
-# context.
+# Define a few command handlers. These usually take the two arguments update and context.
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a message when the command /start is issued."""
     user = update.effective_user
@@ -30,54 +25,48 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         reply_markup=ForceReply(selective=True),
     )
 
-
 async def image(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a message when the command /image is issued."""
     image = await generate_image(update.message.text)
-
     await update.message.reply_photo(image)
-    # await update.message.reply_html(
-    #     rf"Hi {user.mention_html()}!",
-    #     reply_markup=ForceReply(selective=True),
-    # )
-
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a message when the command /help is issued."""
     await update.message.reply_text("Help!")
 
-
 async def reply(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     response = await generate_chat_response(update.message.text)
     await update.message.reply_text(response)
 
-
 application = (
     Application.builder()
-    .token("1921970606:AAFvOb2DLn58gQqaBGXy2R4a5PFewMcP5NE")
+    .token("YOUR_BOT_TOKEN_HERE")
     .build()
 )
 
+# Webhook route to receive updates from Telegram
+@app.route("/", methods=["POST"])
+def webhook() -> None:
+    """Webhook route to handle incoming Telegram updates."""
+    # Decode the incoming request
+    update = Update.de_json(request.get_json(), application.bot)
+    # Dispatch the update to the appropriate handler
+    application.process_update(update)
+    
+    return "ok"
 
-@app.route("/", methods=["POST","GET"])
-def main() -> None:
-    """Start the bot."""
-    # on different commands - answer in Telegram
+if __name__ == "__main__":
+    # Add handlers for different commands
+    try:
+        webhook_set = application.bot.set_webhook(url=WEBHOOK_URL)
+    except:
+        print('Failed to set webhook')
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("help", help_command))
     application.add_handler(CommandHandler("image", image))
 
-    # on non command i.e message - echo the message on Telegram
+    # Handle all text messages
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, reply))
 
-    # Run the bot until the user presses Ctrl-C
-    # application.run_polling(allowed_updates=Update.ALL_TYPES)
-
-
-if __name__ == "__main__":
-    # Start background task in a separate thread
-    # thread = threading.Thread(target=main)
-    # thread.start()
-
-    # # Run Flask server
+    # Start the Flask server to handle webhooks
     app.run(host="0.0.0.0", port=8080)
