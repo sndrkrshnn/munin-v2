@@ -40,18 +40,18 @@ async def reply(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 application = (
     Application.builder()
-    .token("YOUR_BOT_TOKEN_HERE")
+    .token("1921970606:AAFvOb2DLn58gQqaBGXy2R4a5PFewMcP5NE")
     .build()
 )
 
 # Webhook route to receive updates from Telegram
 @app.route("/", methods=["POST"])
-def webhook() -> None:
+async def webhook() -> None:
     """Webhook route to handle incoming Telegram updates."""
     # Decode the incoming request
     update = Update.de_json(request.get_json(), application.bot)
     # Dispatch the update to the appropriate handler
-    application.process_update(update)
+    await application.process_update(update)
     
     return "ok"
 
