@@ -2,6 +2,10 @@ from openai import OpenAI
 from dotenv import load_dotenv
 import json
 from text.functions.weather import get_weather
+from text.functions.websearch import google_search
+from langchain.chains import RetrievalQA
+from langchain.retrievers.multi_query import MultiQueryRetriever
+from langchain_openai import ChatOpenAI
 
 load_dotenv()
 import os
@@ -12,6 +16,28 @@ def fetch_weather(location):
     if location:
         return get_weather(location)
     return "Location not provided."
+
+
+def search_web(query, relevant_searches):
+    llm=ChatOpenAI(
+            model_name="gpt-4o-mini", temperature=0.2, openai_api_key=os.getenv("OPENAI_API_KEY"))
+    db = google_search(query, relevant_searches)
+    retriever = db.as_retriever(
+            search_type="similarity_score_threshold",
+            search_kwargs={"score_threshold": 0.5},
+        )
+    mq_retriever = MultiQueryRetriever.from_llm(
+                retriever=retriever,
+                llm=llm,
+            )
+    qa_chain = RetrievalQA.from_chain_type(
+            llm=llm,
+            chain_type="stuff",
+            retriever=mq_retriever,
+        )
+    response = qa_chain.invoke(BACKGROUND_PROMPT+". Answer the following question with the above mentioned in mind. "+query)
+    return f"{response['result']}. Had to search {relevant_searches} ancient documents for this answer."
+    
 
 
 async def generate_chat_response(prompt):
@@ -32,6 +58,28 @@ async def generate_chat_response(prompt):
                         }
                     },
                     "required": ["location"],
+                    "additionalProperties": False,
+                },
+            },
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "search_web",
+                "description": "Search the web for relevant information.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "query": {
+                            "type": "string",
+                            "description": "The search query you want to send to Google.",
+                        },
+                        "relevant_searches": {
+                            "type": "integer",
+                            "description": "The number of search results that need to be considered for the answer.",
+                        }
+                    },
+                    "required": ["query", "relevant_searches"],
                     "additionalProperties": False,
                 },
             },
@@ -63,11 +111,16 @@ async def generate_chat_response(prompt):
                 messages=[
                     {
                         "role": "system",
-                        "content": BACKGROUND_PROMPT+"Use the given prompt details to summarize the content into the ancient one's wisdom tone. The metrics to be used are km/h, celsius and others in the metric system.",
+                        "content": BACKGROUND_PROMPT+"The metrics to be used are km/h, celsius and others in the metric system.",
                     },
                     {"role": "user", "content": str(fn_res)},
                 ],
             )
             return completion.choices[0].message.content
+        elif 'search' in tool_call.function.name:
+            query = arguments.get("query")
+            relevant_searches = arguments.get("relevant_searches")
+            fn_res = search_web(query, relevant_searches)
+            return str(fn_res)
 
     return completion.choices[0].message.content

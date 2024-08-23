@@ -10,5 +10,6 @@ RUN python -m pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 ENV OPENAI_API_KEY sk-proj-FomcOA0Ki3x5Sk2WERo0T3BlbkFJiShYtnFHtNh12QbODdyU
+ENV GOOGLE_SEARCH AIzaSyCwepsrp8-MCtax0Hr2WwM4lW6tqDvsbIU
 EXPOSE 8080
 ENTRYPOINT ["python", "main.py"]
