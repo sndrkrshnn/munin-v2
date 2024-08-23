@@ -5,7 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 load_dotenv()
 from langchain_openai import OpenAIEmbeddings
-from langchain.vectorstores import FAISS
+from langchain_community.vectorstores import FAISS
 
 GS_API = os.getenv("GOOGLE_SEARCH")
 OA_API = os.getenv("OPENAI_API_KEY")
