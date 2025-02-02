@@ -14,12 +14,13 @@ from text.chat import generate_chat_response
 from flask import Flask, request, Response, abort, make_response, request
 import asyncio
 import uvicorn
+from config import Config
 
 app = Flask(__name__)
 
-WEBHOOK_URL = 'https://munin-odinsraven.azurewebsites.net/'  # Replace with your actual domain
+WEBHOOK_URL = Config.WEBHOOK_URL
+TELEGRAM_BOT_TOKEN = Config.TELEGRAM_BOT_TOKEN
 
-# Define a few command handlers. These usually take the two arguments update and context.
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a message when the command /start is issued."""
     user = update.effective_user
@@ -42,18 +43,12 @@ async def reply(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     response = await generate_chat_response(update.message.text)
     await update.message.reply_text(response)
 
-# application = (
-#     Application.builder()
-#     .token("1921970606:AAFvOb2DLn58gQqaBGXy2R4a5PFewMcP5NE")
-#     .build()
-# )
 
 async def main() -> None:
-    """Set up PTB application and a web application for handling the incoming requests."""
     # Here we set updater to None because we want our custom webhook server to handle the updates
     # and hence we don't need an Updater instance
     application = (
-        Application.builder().token("1921970606:AAFvOb2DLn58gQqaBGXy2R4a5PFewMcP5NE").updater(None).build()
+        Application.builder().token(TELEGRAM_BOT_TOKEN).updater(None).build()
     )
 
     # register handlers
