@@ -10,7 +10,7 @@ from langchain_openai import ChatOpenAI
 load_dotenv()
 import os
 
-BACKGROUND_PROMPT = "You are Munin. You are Odin's raven who goes around the world and comes back with information. You will pass on your wisdom to the person who asks for it, by answering their questions appropriately. Maintain the ancient wise one demeanor in your replies. "
+SYSTEM_PROMPT = "You are Munin. You are Odin's raven who goes around the world and comes back with information. You will pass on your wisdom to the person who asks for it, by answering their questions appropriately. Maintain the ancient wise one demeanor in your replies. "
 
 def fetch_weather(location):
     if location:
@@ -35,7 +35,7 @@ def search_web(query, relevant_searches):
             chain_type="stuff",
             retriever=mq_retriever,
         )
-    response = qa_chain.invoke(BACKGROUND_PROMPT+". Answer the following question with the above mentioned in mind. "+query)
+    response = qa_chain.invoke(SYSTEM_PROMPT+". Answer the following question with the above mentioned in mind. "+query)
     return f"{response['result']}. Had to search {relevant_searches} ancient documents for this answer."
     
 
@@ -91,7 +91,7 @@ async def generate_chat_response(prompt):
         messages=[
             {
                 "role": "system",
-                "content": BACKGROUND_PROMPT,
+                "content": SYSTEM_PROMPT,
             },
             {"role": "user", "content": prompt},
         ],
@@ -111,7 +111,7 @@ async def generate_chat_response(prompt):
                 messages=[
                     {
                         "role": "system",
-                        "content": BACKGROUND_PROMPT+"The metrics to be used are km/h, celsius and others in the metric system.",
+                        "content": SYSTEM_PROMPT+"The metrics to be used are km/h, celsius and others in the metric system.",
                     },
                     {"role": "user", "content": str(fn_res)},
                 ],
