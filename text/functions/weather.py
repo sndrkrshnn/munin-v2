@@ -85,21 +85,3 @@ def get_weather(location):
         "Current wind_direction_10m": current_wind_direction_10m,
         "Current wind_gusts_10m": current_wind_gusts_10m,
     }
-
-
-# print(f"Current time {current.Time()}")
-# print(f"Current temperature_2m {current_temperature_2m}")
-# print(f"Current relative_humidity_2m {current_relative_humidity_2m}")
-# print(f"Current apparent_temperature {current_apparent_temperature}")
-# print(f"Current is_day {'Day' if current_is_day else 'Night'}")
-# print(f"Current precipitation {current_precipitation}")
-# print(f"Current rain {current_rain}")
-# print(f"Current showers {current_showers}")
-# print(f"Current snowfall {current_snowfall}")
-# print(f"Current cloud_cover {current_cloud_cover}")
-# print(f"Current pressure_msl {current_pressure_msl}")
-# print(f"Current surface_pressure {current_surface_pressure}")
-# print(f"Current wind_speed_10m {current_wind_speed_10m}")
-# print(f"Current wind_direction_10m {current_wind_direction_10m}")
-# print(f"Current wind_gusts_10m {current_wind_gusts_10m}") 
-
